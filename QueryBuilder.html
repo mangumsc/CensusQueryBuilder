@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"> </script>
+  <link href="Metrics.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+
+<h1>Census API Query Builder</h1>
+
+<div ng-app="MetricsAPI" ng-controller="titles">
+  
+  <h2>Select a Discovery page - </h2>
+  <select id="selection">
+    <option>http://api.census.gov/data/1990</option>
+    <option>http://api.census.gov/data/1997</option>
+    <option>http://api.census.gov/data/2000</option>
+    <option>http://api.census.gov/data/2002</option>
+    <option>http://api.census.gov/data/2007</option>
+    <option>http://api.census.gov/data/2008</option>
+    <option>http://api.census.gov/data/2009</option>
+    <option>http://api.census.gov/data/2010</option>
+    <option>http://api.census.gov/data/2011</option>
+    <option>http://api.census.gov/data/2012</option>
+    <option>http://api.census.gov/data/2013</option>
+    <option>http://api.census.gov/data/2014</option>
+    <option>http://api.census.gov/data/2015</option>
+    <option>http://api.census.gov/data/2016</option>
+    <option>http://api.census.gov/data/bds</option>
+    <option>http://api.census.gov/data/eits</option>
+    <option>http://api.census.gov/data/timeseries</option>
+    <option>http://web10.dev.rm.census.gov/data/metrics</option>
+  </select>
+  <button type="button" ng-click="loadDiscovery()">Load Endpoints</button>
+  <br><br>
+
+  <div id="mainTable">
+
+    <table ng-repeat="x in datasetsInfo">
+      <tr>
+        <th colspan="2">
+          {{x.title}} <button type="button" ng-click="loadOptionsList(x.varLink,x.title)">  Use this Endpoint </button>
+        </th>
+      </tr>
+      <tr>
+        <td class="bordertd">
+         {{x.description}}
+        </td>
+      </tr>
+    </table>
+
+  </div>
+
+
+  <div id="expandTable">
+
+    <table class="table">
+      <tr>
+        <td colspan="2"><h2>{{endpointTtl}}</h2></td>
+      </tr>
+      <tr>
+        <td colspan="2">{{endpoint}}</td>
+      </tr>
+      <tr>
+        <td>
+          <h3>Variable Selector</h3>
+        </td>
+        <td id="geoSelttl">
+          <h3>Geography and Time Selector</h3>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <select id="varSel" multiple="" size="20">
+            <option ng-repeat="(key,var) in variables" ng-if="!var.predicateOnly " ng-click="addVar()" value="{{key}}">
+              {{var.label}}
+            </option>
+          </select>
+          <select>
+            <option>
+              
+            </option>
+          </select>
+          <input type="text" size="65" id="varSelTxt" value="?get=">
+          <button type="button" ng-click="addVartoLink()">Apply</button>
+          <button type="button" ng-click="clearVar()">Clear</button>
+        </td>
+        <td>
+
+          <select id="geoSel" size="10" ng-click="addGeo()">
+            <option ng-repeat="geo in geography">{{geo.name}}</option>
+          </select>
+
+          <select id="timeSel" size="10" ng-click="addGeo()">
+            <option ng-repeat="(key, data) in datetime">{{key}}</option>
+          </select>
+
+          <input type="text" size="65" id="geoSelTxt" value='&for='>
+          <button type="button" ng-click="addGeotoLink()">Apply</button>
+          <button type="button" ng-click="clearGeo()">Clear</button>
+        </td>
+      </tr>   
+      <tr>
+        <td colspan="2" style="padding: 2em">
+          <input type="text" size="180" id="TableLinkField" value="{{endpoint}}">
+            <button type="button" ng-click="goTableLink()">Go To Table</button>
+        </td>
+      </tr> 
+    </table>
+
+  </div>
+
+</div>
+
+<script src="QueryBuilder.js"> </script>

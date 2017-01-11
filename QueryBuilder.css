@@ -1,0 +1,19 @@
+body {
+	font: 15px sans-serif;
+}
+
+.mainTable {
+	width: 100%;
+}
+
+.expandTable {
+	width: 100%;
+}
+
+.bordertd {
+	border: .3px solid black;
+}
+
+select {
+	width: 550px;
+}
