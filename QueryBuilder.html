@@ -4,7 +4,7 @@
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"> </script>
-  <link href="Metrics.css" rel="stylesheet" type="text/css"/>
+  <link href="QueryBuilder.css" rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
@@ -81,17 +81,20 @@
           </select>
           <select>
             <option>
-              
+              <!-- TODO add in required variables that always add by default -->
             </option>
           </select>
-          <input type="text" size="65" id="varSelTxt" value="?get=">
+          <input type="text" size="69" id="varSelTxt" value="?get=">
           <button type="button" ng-click="addVartoLink()">Apply</button>
           <button type="button" ng-click="clearVar()">Clear</button>
         </td>
         <td>
 
           <select id="geoSel" size="10" ng-click="addGeo()">
-            <option ng-repeat="geo in geography">{{geo.name}}</option>
+            <option ng-if="!geo.requires" ng-repeat="geo in geography">{{geo.name}}</option>
+            <option ng-if="geo.requires && !geo.requires[1]" ng-repeat="geo in geography">{{geo.name}} -- {{geo.requires[0]}}</option>
+            <option ng-if="geo.requires && geo.requires[1]" ng-repeat="geo in geography">{{geo.name}} -- {{geo.requires[0]}} -- {{geo.requires[1]}}</option>
+
           </select>
 
           <select id="timeSel" size="10" ng-click="addGeo()">
