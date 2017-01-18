@@ -14,6 +14,7 @@ var app = angular.module("MetricsAPI",[]);
     $scope.geographies;
     $scope.datetime; 
     $scope.hastime = false;
+    $scope.required = false;
     $scope.getField = "";
     $scope.forField = "";
     $scope.timeField = "";
@@ -50,8 +51,10 @@ var app = angular.module("MetricsAPI",[]);
       $scope.getField = "";
       $scope.forField = "";
       $scope.goTable = "";
-      $scope.hastime = false;
       $scope.datetime = "";
+      $scope.hastime = false;
+      $scope.required = false;
+      $scope.requiredVar = [];
 
       document.getElementById('mainTable').style.visibility = 'collapse';
       document.getElementById('expandTable').style.visibility = 'visible';
@@ -66,8 +69,16 @@ var app = angular.module("MetricsAPI",[]);
         if($scope.variables.time){
           $scope.hastime = true;
           $scope.datetime = $scope.variables.time.datetime;
-          console.log($scope.datetime);
         };
+
+        // read in all required variables and default put into get statement
+
+        Object.keys($scope.variables).forEach(function(key,index){
+          if($scope.variables[key].required && $scope.variables[key].predicateOnly !== true){
+            $scope.requiredVar.push(key);
+            $scope.required = true;
+          }
+        });
          
       });
 
@@ -80,6 +91,9 @@ var app = angular.module("MetricsAPI",[]);
 
     $scope.addVar = function() {
 
+      var required = '';
+      if($scope.required = true){required=','};
+
       options = document.getElementById('varSel');
       optionsSel = [];
 
@@ -88,31 +102,39 @@ var app = angular.module("MetricsAPI",[]);
           optionsSel.push(options[i].value);
         }
       }
-      document.getElementById('varSelTxt').value = "?get=" + optionsSel;
+      document.getElementById('varSelTxt').value = "?get=" + $scope.requiredVar + required + optionsSel;
     };
 
     $scope.addGeo = function() {
+
       document.getElementById('geoSelTxt').value = '&for=';
       optionsgeo = document.getElementById('geoSel');
       optionstime = document.getElementById('timeSel');
       optionsSel = '';
+      var optionsReq = '';
 
       for (i=0;i<optionsgeo.length;i++){
         if(optionsgeo[i].selected){
-          optionsSel = optionsgeo[i].value;
-          document.getElementById('geoSelTxt').value += optionsSel +':*';
-        }
+          optionsSel = optionsgeo[i].value.split(' -- ');
+          optionsReq = optionsSel[0] + ':*';
+
+          for (j=1;j<optionsSel.length;j++){
+              optionsReq += '&in=' + optionsSel[j] + ':*';
+            }
+          }
+
       };
+
+      document.getElementById('geoSelTxt').value += optionsReq;
 
       for (i=0;i<optionstime.length;i++){
         if(optionstime[i].selected){
           optionsSel = optionstime[i].value.toUpperCase();
-          document.getElementById('geoSelTxt').value += '&' + optionsSel +'=*';
+          document.getElementById('geoSelTxt').value += '&' + optionsSel + '=' + timeQual;
         }
       }
       
     };
-
 
     $scope.addVartoLink = function() {
       $scope.getField = document.getElementById('varSelTxt').value;
