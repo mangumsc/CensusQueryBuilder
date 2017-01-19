@@ -130,7 +130,7 @@ var app = angular.module("MetricsAPI",[]);
       for (i=0;i<optionstime.length;i++){
         if(optionstime[i].selected){
           optionsSel = optionstime[i].value.toUpperCase();
-          document.getElementById('geoSelTxt').value += '&' + optionsSel + '=' + timeQual;
+          document.getElementById('geoSelTxt').value += '&' + optionsSel + '=*';
         }
       }
       
