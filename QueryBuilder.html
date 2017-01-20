@@ -38,16 +38,20 @@
   <br><br>
 
   <div id="mainTable">
-
-    <table ng-repeat="x in datasetsInfo">
+    Filter Titles: <input ng-model="titleFilter.title" type="text" size="70">
+    <table ng-repeat="x in datasetsInfo | filter:titleFilter" class="bordertd">
       <tr>
-        <th colspan="2">
-          {{x.title}} <button type="button" ng-click="loadOptionsList(x.varLink,x.title)">  Use this Endpoint </button>
+        <th style='width: 20%; text-align: left;' >
+          {{x.title}} 
         </th>
+        <td rowspan='2' class="bordertd">
+         {{x.description}}
+        </td>
       </tr>
       <tr>
-        <td class="bordertd">
-         {{x.description}}
+        
+        <td>
+          <button type="button" ng-click="loadOptionsList(x.varLink,x.title)">  Use this Endpoint </button>
         </td>
       </tr>
     </table>
@@ -74,6 +78,7 @@
       </tr>
       <tr>
         <td>
+          <!-- Filter: <input ng-model="varFilterInput" type="text" size="50"> -->
           <select id="varSel" multiple="" size="20">
             <option ng-repeat="(key,var) in variables" ng-if="!var.predicateOnly " ng-click="addVar()" value="{{key}}">
               {{var.label}}
