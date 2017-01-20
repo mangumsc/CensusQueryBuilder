@@ -69,9 +69,8 @@ var app = angular.module("MetricsAPI",[]);
         if($scope.variables.time){
           $scope.hastime = true;
           $scope.datetime = $scope.variables.time.datetime;
+          $scope.datetime.time = true;
         };
-
-        // read in all required variables and default put into get statement
 
         Object.keys($scope.variables).forEach(function(key,index){
           if($scope.variables[key].required && $scope.variables[key].predicateOnly !== true){
@@ -111,10 +110,12 @@ var app = angular.module("MetricsAPI",[]);
       optionsgeo = document.getElementById('geoSel');
       optionstime = document.getElementById('timeSel');
       optionsSel = '';
-      var optionsReq = '';
+      optionshasdate = false;
+      optionsReq = '';
 
       for (i=0;i<optionsgeo.length;i++){
         if(optionsgeo[i].selected){
+          optionshasdate = true;
           optionsSel = optionsgeo[i].value.split(' -- ');
           optionsReq = optionsSel[0] + ':*';
 
@@ -129,8 +130,18 @@ var app = angular.module("MetricsAPI",[]);
 
       for (i=0;i<optionstime.length;i++){
         if(optionstime[i].selected){
-          optionsSel = optionstime[i].value.toUpperCase();
-          document.getElementById('geoSelTxt').value += '&' + optionsSel + '=*';
+
+          if(optionstime[i].value == 'time') {
+            optionsSel = optionstime[i].value;
+          } else {
+            optionsSel = optionstime[i].value.toUpperCase();
+          }
+           console.log(optionsSel);
+          if(optionshasdate == true) {
+            document.getElementById('geoSelTxt').value += '&' + optionsSel + '=*'
+          } else {
+            document.getElementById('geoSelTxt').value += optionsSel + '=*'
+          };
         }
       }
       
