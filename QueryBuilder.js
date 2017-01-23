@@ -19,13 +19,14 @@ var app = angular.module("MetricsAPI",[]);
     $scope.forField = "";
     $scope.timeField = "";
 
-    $scope.loadDiscovery = function() { 
+    $scope.loadDiscovery = function(select) { 
 
       document.getElementById('mainTable').style.visibility = 'visible';
       document.getElementById('expandTable').style.visibility = 'collapse';
 
       var url = document.getElementById("selection");
       var urlSel = url.options[url.selectedIndex].value;
+    
       $scope.datasetsInfo = [];
 
       $http.get(urlSel + '.json')
@@ -90,8 +91,9 @@ var app = angular.module("MetricsAPI",[]);
 
     $scope.addVar = function() {
 
+
       var required = '';
-      if($scope.required = true){required=','};
+      if($scope.required == true){required = ','};
 
       options = document.getElementById('varSel');
       optionsSel = [];
@@ -101,6 +103,7 @@ var app = angular.module("MetricsAPI",[]);
           optionsSel.push(options[i].value);
         }
       }
+      console.log(required);
       document.getElementById('varSelTxt').value = "?get=" + $scope.requiredVar + required + optionsSel;
     };
 
@@ -130,13 +133,12 @@ var app = angular.module("MetricsAPI",[]);
 
       for (i=0;i<optionstime.length;i++){
         if(optionstime[i].selected){
-
+          if(optionshasdate == false){document.getElementById('geoSelTxt').value = '&'}
           if(optionstime[i].value == 'time') {
             optionsSel = optionstime[i].value;
           } else {
             optionsSel = optionstime[i].value.toUpperCase();
           }
-           console.log(optionsSel);
           if(optionshasdate == true) {
             document.getElementById('geoSelTxt').value += '&' + optionsSel + '=*'
           } else {
