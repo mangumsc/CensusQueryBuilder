@@ -2,8 +2,9 @@
 <meta charset="utf-8">
 
 <head>
+  <title>API Query Builder</title>
+  <link rel="icon" type="image/png" href="favicon.ico"/>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"> </script>
   <link href="QueryBuilder.css" rel="stylesheet" type="text/css"/>
 </head>
 
@@ -12,7 +13,6 @@
 <h1>Census API Query Builder</h1>
 
 <div ng-app="MetricsAPI" ng-controller="titles">
-  
   <h2>Select a Discovery page - </h2>
   <select id="selection">
     <option>http://api.census.gov/data</option>
@@ -21,34 +21,33 @@
     <option>http://api.census.gov/data/timeseries</option>
     <option>http://web10.dev.rm.census.gov/data</option>
     <option>http://web9.test.rm.census.gov/data</option>
+    <option>http://web9.test.rm.census.gov/dataAlpha</option>
   </select>
   <button type="button" ng-click="loadDiscovery()">Load Endpoints</button>
-  <br><br>
+  <br><br> <br><br>
 
   <div id="mainTable">
     Filter Titles: <input ng-model="titleFilter.title" type="text" size="70">
-    <table ng-repeat="x in datasetsInfo | filter:titleFilter" class="bordertd">
+    <br>
+    <table ng-repeat="x in datasetsInfo | filter:titleFilter " class="bordertd">
       <tr>
-        <th style='width: 20%; text-align: left;' >
+        <th style='width: 30%; text-align: left;' >
           {{x.title}} 
         </th>
         <td rowspan='2' class="bordertd">
-         {{x.description}}
+         {{x.description}} <br><br> {{x.varLink}}
         </td>
       </tr>
       <tr>
         
         <td>
-          <button type="button" ng-click="loadOptionsList(x.varLink,x.title)">  Use this Endpoint </button>
+          <button type="button" ng-click="loadOptionsList(x.varLink,x.title); varFilterInput = undefined">  Use this Endpoint </button>
         </td>
       </tr>
     </table>
-
   </div>
 
-
   <div id="expandTable">
-
     <table class="table">
       <tr>
         <td colspan="2"><h2>{{endpointTtl}}</h2></td>
@@ -66,11 +65,18 @@
       </tr>
       <tr>
         <td>
-          <!-- Filter: <input ng-model="varFilterInput" type="text" size="50"> -->
-          <select id="varSel" multiple="" size="20">
-            <option ng-repeat="(key,var) in variables" ng-if="!var.predicateOnly " ng-click="addVar()" value="{{key}}">
-              {{var.label}}
+          Filter: <input id="varFilterInput" ng-model="varFilterInput" type="text" size="50">
+          <select id="varSel" multiple="" size="15">
+
+            <option ng-repeat="var in variables2 | filter:varFilterInput | orderBy: var[0]" ng-if="var[2] == undefined" value="{{var[0]}}">
+              {{var[0]}} -- {{var[1]}}
             </option>
+          </select>
+          <br>
+          <button type="buton" ng-click="addVar();" style="line-height: 20px; width:270px;">-  -  - \/ -  -  -</button>
+          <button type="buton" ng-click="upVar();" style="line-height: 20px; width:270px">-  -  - /\ -  -  -</button>
+          <br>
+          <select id="varSel2" size="4">
           </select>
           <input type="text" size="69" id="varSelTxt" value="?get=">
           <button type="button" ng-click="addVartoLink()">Apply</button>
@@ -78,7 +84,7 @@
         </td>
         <td>
 
-          <select id="geoSel" size="10" ng-click="addGeo()">
+          <select id="geoSel" size="14" ng-click="addGeo()">
             <option ng-if="!geo.requires" ng-repeat="geo in geography">{{geo.name}}</option>
             <option ng-if="geo.requires && !geo.requires[1]" ng-repeat="geo in geography">{{geo.name}} -- {{geo.requires[0]}}</option>
             <option ng-if="geo.requires && geo.requires[1] && !geo.requires[2]" ng-repeat="geo in geography">{{geo.name}} -- {{geo.requires[0]}} -- {{geo.requires[1]}}</option>
@@ -86,7 +92,7 @@
 
           </select>
 
-          <select id="timeSel" size="10" ng-click="addGeo()">
+          <select id="timeSel" size="8" ng-click="addGeo()">
             <option ng-repeat="(key, data) in datetime">{{key}}</option>
           </select>
 
@@ -98,13 +104,20 @@
       <tr>
         <td colspan="2" style="padding: 2em">
           <input type="text" size="180" id="TableLinkField" value="{{endpoint}}">
-            <button type="button" ng-click="goTableLink()">Go To Table</button>
+            <button type="button" ng-click="goTableLink_adv()" >Go To Table (interactive result)</button>
+            <button type="button" ng-click="goTableLink()" >Go To Table (plain return)</button>
         </td>
       </tr> 
     </table>
 
   </div>
 
+</div>
+
+
+
+<div style="position: fixed; bottom: 3px; background-color: white;">
+  Any Issues or Requested Improvements e-mail Stephen.C.Mangum@Census.gov
 </div>
 
 <script src="QueryBuilder.js"> </script>

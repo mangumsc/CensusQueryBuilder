@@ -17,3 +17,48 @@ body {
 select {
 	width: 550px;
 }
+
+#outputTable {
+  border-collapse: collapse;
+}
+
+#outputTable td{
+  border: 1px solid black;
+  padding: 5px 20px;
+  text-align: right;
+  font-size: 1em;
+}
+
+#outputTable th{
+  border: 1px solid black;
+  padding: 5px 20px;
+  text-align: right;
+  font-size: 1.2em;
+}
+
+.sortorder:after {
+  content: '\25b2';   // BLACK UP-POINTING TRIANGLE
+}
+.sortorder.reverse:after {
+  content: '\25bc';   // BLACK DOWN-POINTING TRIANGLE
+}
+
+#loading {
+    border: 16px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid #000000; /* Blue */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    -webkit-animation: spin 1s linear infinite;
+    animation: spin 1s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
