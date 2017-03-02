@@ -18,6 +18,10 @@ select {
 	width: 550px;
 }
 
+.select2 {
+  width: 240px;
+}
+
 #outputTable {
   border-collapse: collapse;
 }
@@ -44,6 +48,10 @@ select {
 }
 
 #loading {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: auto;
+    margin-bottom: auto;
     border: 16px solid #f3f3f3; /* Light grey */
     border-top: 16px solid #000000; /* Blue */
     border-radius: 50%;
@@ -61,4 +69,25 @@ select {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.paginationclass{
+    
+margin: 19px 28px;    
+}
+.paginationclass span{
+    margin-left:15px;
+    display:inline-block;
+}
+.pagination-controle li{
+    display: inline-block;
+}
+.pagination-controle button{
+    font-size: 12px;
+    margin-top: -26px;
+    cursor:pointer;
+    
+}
+.pagination{
+    margin:5px 12px !important;
 }

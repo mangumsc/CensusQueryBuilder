@@ -52,7 +52,6 @@ var app = angular.module("MetricsAPI",[]);
       document.getElementById('expandTable').style.display = 'inline';
 
       document.getElementById('geoSelTxt').value = '&for=';
-      document.getElementById('varSelTxt').value = "?get=";
       document.getElementById('varSel').selectedIndex = -1;
       document.getElementById('varSel2').innerHTML = '';
       document.getElementById('timeSel').selectedIndex = -1;
@@ -60,11 +59,14 @@ var app = angular.module("MetricsAPI",[]);
       $scope.getField = "";
       $scope.forField = "";
       $scope.goTable = "";
-      $scope.datetime = "";
       $scope.hastime = false;
       $scope.required = false;
       $scope.requiredVar = [];
+      $scope.stringVar = [];
+      $scope.intVar = [];
       $scope.variables2 = [];
+      $scope.datetime = [];
+      allowedtime = ['YEAR','YR','YEAR2','MONTH','QUARTER'];
 
       $scope.endpointTtl = urLinkTtl;
       $scope.endpoint = urLink;
@@ -78,17 +80,33 @@ var app = angular.module("MetricsAPI",[]);
 
         $scope.variables = varLoad.variables;
 
-        if($scope.variables.time){
-          $scope.hastime = true;
-          $scope.datetime = $scope.variables.time.datetime;
-          $scope.datetime.time = true;
-        };
+        if($scope.variables.time){$scope.hastime = true; $scope.datetime.push('time')};
 
         Object.keys($scope.variables).forEach(function(key,index){
           if($scope.variables[key].required && $scope.variables[key].predicateOnly !== true){
             $scope.requiredVar.push(key);
             $scope.required = true;
           }
+        });
+
+        Object.keys($scope.variables).forEach(function(key,index){
+          sel = '';
+            if($scope.hastime == true){
+              for(j=0;j<allowedtime.length;j++){
+                if(key.toUpperCase() == allowedtime[j]){
+                  sel = 'time';
+                }
+              }
+            };
+
+            if(sel == 'time'){
+              $scope.datetime.push(key);
+            } else {
+              if($scope.variables[key].predicateOnly !== true){
+                if($scope.variables[key].predicateType == 'string'){$scope.stringVar.push(key);};
+                if($scope.variables[key].predicateType == 'int'){$scope.intVar.push(key);};
+              };
+            };
         });
          
       });
@@ -120,10 +138,12 @@ var app = angular.module("MetricsAPI",[]);
       for (i=0;i<options.length;i++){
           optionsSel.push(options[i].value);
       };
-      
-      document.getElementById('varSelTxt').value = "?get=" + $scope.requiredVar + required + optionsSel;
 
       document.getElementById('varSel').selectedIndex = -1;
+
+      $scope.getField = "?get=" + $scope.requiredVar + required + optionsSel;
+      $scope.goTable = $scope.endpoint + $scope.getField + $scope.forField;
+      document.getElementById('TableLinkField').value = $scope.goTable;
     };
 
 
@@ -148,7 +168,7 @@ var app = angular.module("MetricsAPI",[]);
           optionsSel.push(options[i].value);
       }
       
-      document.getElementById('varSelTxt').value = "?get=" + $scope.requiredVar + required + optionsSel;
+      document.getElementById('TableLinkField').value = $scope.endpoint + "?get=" + $scope.requiredVar + required + optionsSel;
 
     };
 
@@ -158,8 +178,11 @@ var app = angular.module("MetricsAPI",[]);
       document.getElementById('geoSelTxt').value = '&for=';
       optionsgeo = document.getElementById('geoSel');
       optionstime = document.getElementById('timeSel');
+      optionsstring = document.getElementById('stringSel');
+      optionsint = document.getElementById('intSel');
       optionsSel = '';
       optionshasdate = false;
+      optionstimesel = false;
       optionsReq = '';
 
       for (i=0;i<optionsgeo.length;i++){
@@ -179,26 +202,41 @@ var app = angular.module("MetricsAPI",[]);
 
       for (i=0;i<optionstime.length;i++){
         if(optionstime[i].selected){
+          optionstimesel = true;
           if(optionshasdate == false){document.getElementById('geoSelTxt').value = '&'}
-          if(optionstime[i].value == 'time') {
-            optionsSel = optionstime[i].value;
-          } else {
-            optionsSel = optionstime[i].value.toUpperCase();
-          }
+          optionsSel = optionstime[i].value;
           if(optionshasdate == true) {
             document.getElementById('geoSelTxt').value += '&' + optionsSel + '=*'
           } else {
             document.getElementById('geoSelTxt').value += optionsSel + '=*'
           };
         }
-      }
-      
-    };
+      };
 
-    $scope.addVartoLink = function() {
-      $scope.getField = document.getElementById('varSelTxt').value;
-      $scope.goTable = $scope.endpoint + $scope.getField + $scope.forField;
-      document.getElementById('TableLinkField').value = $scope.goTable;
+      if(optionshasdate == false && optionstimesel == false){document.getElementById('geoSelTxt').value = '&'}
+
+      for(i=0;i<optionsstring.length;i++){
+        if(optionsstring[i].selected){
+
+          if(optionshasdate == true) {
+            document.getElementById('geoSelTxt').value += '&' + optionsstring[i].value + '=*'
+          } else {
+            document.getElementById('geoSelTxt').value += optionsstring[i].value + '=*'
+          }; 
+        }
+      };
+
+      for(i=0;i<optionsint.length;i++){
+        if(optionsint[i].selected){
+          if(optionshasdate == true) {
+            document.getElementById('geoSelTxt').value += '&' + optionsint[i].value + '=*'
+          } else {
+            document.getElementById('geoSelTxt').value += optionsint[i].value + '=*'
+          }; 
+        }
+      };
+
+      
     };
 
     $scope.addGeotoLink = function() {
@@ -223,6 +261,8 @@ var app = angular.module("MetricsAPI",[]);
       document.getElementById('geoSelTxt').value = '&for=';
       document.getElementById('geoSel').selectedIndex = -1;
       document.getElementById('timeSel').selectedIndex = -1;
+      document.getElementById('stringSel').selectedIndex = -1;
+      document.getElementById('intSel').selectedIndex = -1;
     }
 
     $scope.goTableLink_adv = function goTableLink (argument) {

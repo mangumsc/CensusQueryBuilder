@@ -22,66 +22,127 @@
 
 <div id="loading"></div>
 
-<div id="loaded" ng-app="Output" ng-controller="table">
+<div id="loaded" 
+    style="display: none" 
+    ng-app="Output" 
+    ng-controller="table">
 
-  <a href='#' class="export" id="downloadCSV" style="display:none;">Download as CSV</a><br><br>
+<div ng-if="query_length > 5000">Current Row Limit for Interactive view is 5,000 <br> Non-returned rows: {{query_length - 5000}}<br></div> 
 
+<div ng-if="query_length < 5000">Returned rows: {{query_length}}<br></div>
+
+  <a href='#' class="export" id="downloadCSV">Download as CSV</a><br><br>
+            
 	<table id="outputTable">
 		<tr>
-			<th ng-repeat="x in query_head track by $index">{{x}}</th>
+			<th ng-repeat="x in query_head track by $index">
+        {{x}}
+      </th>
 		</tr>
-		<tr ng-repeat="body in query_body" ng-if="$index > 0">
+		<tr ng-repeat="body in query_body | limitTo: 5000" ng-if="$index > 0">
 			<td ng-repeat="col in col_num" >{{body[col]}}</td>
 		</tr>
 	</table>
-	
+
+
 </div>
+<iframe id="Response" style="display:none;" height="500" width="1000"></iframe>
+<br>
+<br>
 
-<iframe id="Response" style="display:none;" height="60" width="1000"></iframe>
-
-<div style="position: fixed; bottom: 3px; background-color: white;">
+<!-- <div style="position: fixed; bottom: 3px; background-color: white;">
   Any Issues or Requested Improvements e-mail Stephen.C.Mangum@Census.gov
-</div>
-
+</div> -->
 </body>
 
+<script id="worker1" type="javascript/worker">
+self.addEventListener('message', function(e) {
+  
+  fetch(e.data, function(xhr) { 
+    var result = xhr.responseText;
+    var object = JSON.parse(result);
+    setTimeout(function() { sendback(); }, 2000);
+    function sendback(){
+      self.postMessage(JSON.parse(JSON.stringify(object)));
+    }
+  });
+
+}, false);
+  function fetch(url, callback) {
+    var xhr = new XMLHttpRequest(); 
+    xhr.onreadystatechange = function () {
+      console.log(xhr.readyState);
+      if(xhr.readyState < 4) {return;}
+      if(xhr.status !== 200) {self.postMessage('error');}
+      if(xhr.readyState === 4) {callback(xhr);}     
+    }
+    xhr.open('GET', url, true);
+    xhr.send('');
+  }
+</script>
+
 <script>
-
-
 var app = angular.module("Output",[]);
+
+  app.filter('pagination', function()
+    {
+     return function(input, start)
+     {
+      start = +start;
+      return input.slice(start);
+     };
+    });
 
   app.controller("table", function($scope,$http,$q) {
 
-  	
-
+    $scope.query_body = [];
   	$scope.col_num = [];
   	$scope.query = sessionStorage.getItem('query');
   	document.getElementById('queryval').value = $scope.query.replace('&key=86ef546139db8dddaff1b4a9562f9a902f2b60b0','');
-    
-  	 $http.get($scope.query).success(function(query){
-          $scope.query_head = query[0];
-          for(i=0;i<query[0].length;i++){
-          	$scope.col_num.push(i);
-          };
-          $scope.query_body = query;
-          document.getElementById('downloadCSV').style.display = 'inline';
+
+
+      var blob = new Blob([document.querySelector('#worker1').textContent]);
+      var blobURL = window.URL.createObjectURL(blob);
+      var worker = new Worker(blobURL);
+
+      
+      worker.addEventListener('error',
+        function wk_error (err){
+          Response = document.getElementById('Response');
+          Response.style.display = 'inline';
+          document.getElementById('downloadCSV').style.display = 'none';
+          Response.src = $scope.query;
           document.getElementById('loading').style.display = 'none';
           document.getElementById('loaded').style.display = 'inline';
-      })
-  	 	.error(function(){
-  	 		Response = document.getElementById('Response');
-  	 		Response.style.display = 'inline';
-  	 		Response.src = $scope.query;
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('loaded').style.display = 'inline';
-  	  });
+          $scope.$apply() 
+        }
+      ,false);
+        
+      worker.addEventListener('message', function(e) {
+        if(e.data !== 'error'){
+          $scope.query_head = e.data[0];
+            for(i=0;i<e.data[0].length;i++){
+              $scope.col_num.push(i);
+            };
+            $scope.query_body = e.data;
+            $scope.query_length = e.data.length;
+            $scope.$apply() 
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('loaded').style.display = 'inline';
+        };
+          
+      }, false);
+
+      worker.postMessage($scope.query);
 
        $scope.sortBy = function(propertyName) {
             $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : true;
             $scope.propertyName = propertyName;
          };
-  });
 
+      });
+    
   function reload(){
   	sessionStorage.setItem('query', document.getElementById('queryval').value + '&key=86ef546139db8dddaff1b4a9562f9a902f2b60b0');
   	window.open("QueryBuilderOut.html","_self");

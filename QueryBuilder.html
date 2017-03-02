@@ -24,7 +24,7 @@
     <option>http://web9.test.rm.census.gov/dataAlpha</option>
   </select>
   <button type="button" ng-click="loadDiscovery()">Load Endpoints</button>
-  <br><br> <br><br>
+  <br><br>
 
   <div id="mainTable">
     Filter Titles: <input ng-model="titleFilter.title" type="text" size="70">
@@ -57,16 +57,16 @@
       </tr>
       <tr>
         <td>
-          <h3>Variable Selector</h3>
+          <h3>Get Statement Selector</h3>
         </td>
         <td id="geoSelttl">
-          <h3>Geography and Time Selector</h3>
+          <h3>For Statement Selector</h3>
         </td>
       </tr>
       <tr>
         <td>
           Filter: <input id="varFilterInput" ng-model="varFilterInput" type="text" size="50">
-          <select id="varSel" multiple="" size="15">
+          <select id="varSel" multiple="" size="18">
 
             <option ng-repeat="var in variables2 | filter:varFilterInput | orderBy: var[0]" ng-if="var[2] == undefined" value="{{var[0]}}">
               {{var[0]}} -- {{var[1]}}
@@ -76,36 +76,59 @@
           <button type="buton" ng-click="addVar();" style="line-height: 20px; width:270px;">-  -  - \/ -  -  -</button>
           <button type="buton" ng-click="upVar();" style="line-height: 20px; width:270px">-  -  - /\ -  -  -</button>
           <br>
-          <select id="varSel2" size="4">
+          <select id="varSel2" size="7">
           </select>
-          <input type="text" size="69" id="varSelTxt" value="?get=">
-          <button type="button" ng-click="addVartoLink()">Apply</button>
-          <button type="button" ng-click="clearVar()">Clear</button>
         </td>
         <td>
+        	<table>
+        		<tr>
+        			<td>
+			          Integer Filter: <input id="stringFilterInput" ng-model="intFilterInput" type="text" size="17">
 
-          <select id="geoSel" size="14" ng-click="addGeo()">
-            <option ng-if="!geo.requires" ng-repeat="geo in geography">{{geo.name}}</option>
-            <option ng-if="geo.requires && !geo.requires[1]" ng-repeat="geo in geography">{{geo.name}} -- {{geo.requires[0]}}</option>
-            <option ng-if="geo.requires && geo.requires[1] && !geo.requires[2]" ng-repeat="geo in geography">{{geo.name}} -- {{geo.requires[0]}} -- {{geo.requires[1]}}</option>
-            <option ng-if="geo.requires && geo.requires[2]" ng-repeat="geo in geography">{{geo.name}} -- {{geo.requires[0]}} -- {{geo.requires[1]}} -- {{geo.requires[2]}}</option>
+			          <select id="intSel" size="8" ng-click="addGeo()" multiple="" class="select2">
+			          	<option ng-repeat="int in intVar | filter:intFilterInput | orderBy: int">{{int}}</option>
+			          </select>
+			        </td>
+			        <td>
+			           String Filter: <input id="stringFilterInput" ng-model="stringFilterInput" type="text" size="17">
 
-          </select>
-
-          <select id="timeSel" size="8" ng-click="addGeo()">
-            <option ng-repeat="(key, data) in datetime">{{key}}</option>
-          </select>
-
-          <input type="text" size="65" id="geoSelTxt" value='&for='>
-          <button type="button" ng-click="addGeotoLink()">Apply</button>
-          <button type="button" ng-click="clearGeo()">Clear</button>
+			          <select id="stringSel" size="8" ng-click="addGeo()" multiple="" class="select2">
+			          	<option ng-repeat="string in stringVar | filter:stringFilterInput | orderBy: string">{{string}}</option>
+			          </select>
+			        </td>
+			    </tr>
+			    <tr>
+			    	<td colspan="2">
+			          Geography:
+			          <br>
+			          <select id="geoSel" size="9" ng-click="addGeo()">
+			            <option ng-if="!geo.requires" ng-repeat="geo in geography">{{geo.name}}</option>
+			            <option ng-if="geo.requires && !geo.requires[1]" ng-repeat="geo in geography">{{geo.name}} -- {{geo.requires[0]}}</option>
+			            <option ng-if="geo.requires && geo.requires[1] && !geo.requires[2]" ng-repeat="geo in geography">{{geo.name}} -- {{geo.requires[0]}} -- {{geo.requires[1]}}</option>
+			            <option ng-if="geo.requires && geo.requires[2]" ng-repeat="geo in geography">{{geo.name}} -- {{geo.requires[0]}} -- {{geo.requires[1]}} -- {{geo.requires[2]}}</option>
+			          </select>
+			          <br>
+			          Time:
+			          <br>
+			          <select id="timeSel" size="5" ng-click="addGeo()">
+			            <option ng-repeat="time in datetime">{{time}}</option>
+			          </select> 
+			          <br><br>
+				      	  <input type="text" size="60" id="geoSelTxt" value='&for='>
+				          <button type="button" ng-click="addGeotoLink()">Apply</button>
+				          <button type="button" ng-click="clearGeo()">Clear</button>
+				          <br>
+				          <i style='font-size: .7em'>Replace the wildcard (*) where needed</i>
+			        </td>
+	        	</tr>         
+	        </table>
         </td>
       </tr>   
-      <tr>
-        <td colspan="2" style="padding: 2em">
-          <input type="text" size="180" id="TableLinkField" value="{{endpoint}}">
-            <button type="button" ng-click="goTableLink_adv()" >Go To Table (interactive result)</button>
-            <button type="button" ng-click="goTableLink()" >Go To Table (plain return)</button>
+        <td colspan="2">
+        <br><br>
+          <input type="text" size="195" id="TableLinkField" value="{{endpoint}}"><br>
+            <button type="button" ng-click="goTableLink_adv()" >Generate Table</button>
+            <button type="button" ng-click="goTableLink()" >Return API</button>
         </td>
       </tr> 
     </table>
@@ -116,8 +139,8 @@
 
 
 
-<div style="position: fixed; bottom: 3px; background-color: white;">
+<!-- <div style="position: fixed; bottom: 3px; background-color: white;">
   Any Issues or Requested Improvements e-mail Stephen.C.Mangum@Census.gov
-</div>
+</div> -->
 
 <script src="QueryBuilder.js"> </script>
